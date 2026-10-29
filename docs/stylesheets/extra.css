@@ -1,0 +1,16 @@
+/* 宽表格在窄屏上横向滚动，避免挤出正文 */
+.md-typeset table:not([class]) {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* 中文正文行距略放宽，长段落更好读 */
+.md-typeset {
+  line-height: 1.75;
+}
+
+/* 首页卡片中的标题与说明之间留一点空隙 */
+.md-typeset .grid.cards > ul > li > p:first-child {
+  margin-bottom: 0.4rem;
+}
