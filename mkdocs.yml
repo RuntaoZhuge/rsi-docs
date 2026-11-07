@@ -39,6 +39,7 @@ nav:
   - 首页: index.md
   - 研究动机: motivation.md
   - 实验方案（任务书）: experiment.md
+  - 执行环境与进度: environment.md
   - 实验进展与结果: results.md
   - 幻灯片: slides.md
 
