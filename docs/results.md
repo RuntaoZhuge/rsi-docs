@@ -63,6 +63,9 @@
 
 两者都远离天花板，提升空间充足 → G2 通过。
 
+逐题产物与哈希见 <a href="../assets/g2/g2_summary.json"><code>g2_summary.json</code></a>（含 4 个 `jsonl` 的 SHA256；
+原始文件在实验仓 `experiments/eval/<MODEL>/E0/`，不随本站发布）。
+
 ---
 
 ## 4. G3 试训有效性

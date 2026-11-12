@@ -1,0 +1,54 @@
+{
+  "gate": "G2",
+  "description": "G2 能力前测：LiveCodeBench release_v6 的 DEV 窗口，183 题，一次生成 pass@1",
+  "generated": "2026-11-12",
+  "protocol": {
+    "bench": "lcb",
+    "bench_name": "LiveCodeBench",
+    "release": "release_v6",
+    "split": "dev",
+    "window": ["2024-09-20", "2024-12-31"],
+    "n_items": 183,
+    "temperature": 0.2,
+    "do_sample": true,
+    "n": 1,
+    "max_new_tokens": 2048,
+    "seed": 20261107,
+    "note": "n=1 为本项目统一的一次生成 pass@1，非官方 n=10 配置"
+  },
+  "models": {
+    "M0": {
+      "base": "Qwen/Qwen2.5-7B-Instruct",
+      "path": "/root/private_data/rsi/models/M0_frozen",
+      "adapter": null,
+      "passed": 18,
+      "n": 183,
+      "pass@1": 0.09836065573770492,
+      "ci95": [0.060109289617486336, 0.14207650273224043],
+      "invalid": 0
+    },
+    "S1": {
+      "base": "mickelliu/Self-RedTeam-Qwen2.5-7B-Instruct",
+      "path": "/root/private_data/rsi/models/S1_frozen",
+      "adapter": null,
+      "passed": 11,
+      "n": 183,
+      "pass@1": 0.060109289617486336,
+      "ci95": [0.0273224043715847, 0.09836065573770492],
+      "invalid": 0
+    }
+  },
+  "decision": {
+    "criterion": "两个模型都远离天花板，存在可观测的提升空间",
+    "result": "通过",
+    "note": "183 题的分辨率下限约 11.5pp，更小的差异只能记作不可分辨"
+  },
+  "files": {
+    "eval/M0/E0/lcb_dev.jsonl": "4e25bf7b88bf71eabdbfca8ed359d6dd53cb538d739286694fd08aa7e0800388",
+    "eval/M0/E0/lcb_dev_scored.jsonl": "f0af903d322c59c25b0cb9ba34cc8cb2084775e739a911e2af19b80bfb127d68",
+    "eval/S1/E0/lcb_dev.jsonl": "b2636970d604695859dd1566e68f84f4caa3aa7dd4eda35d7cb6f9e3c89aad59",
+    "eval/S1/E0/lcb_dev_scored.jsonl": "d70a3ba2125bbe37491ebcf7031232cb12d84af42cd8da451b1c9ea9c0cd2ee8"
+  },
+  "raw_data_location": "实验仓 experiments/eval/<MODEL>/E0/，逐题原始文件不随本站发布",
+  "summary_source": "experiments/analysis/summary.csv"
+}
