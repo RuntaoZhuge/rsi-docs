@@ -41,6 +41,7 @@ nav:
   - 实验方案（任务书）: experiment.md
   - 执行环境与进度: environment.md
   - 实验进展与结果: results.md
+  - 讨论摘要（11-12）: discussion.md
   - 幻灯片: slides.md
 
 markdown_extensions:
