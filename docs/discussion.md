@@ -189,41 +189,47 @@
   </div>
 </div>
 
-<h2>06 能写 / 不能写</h2>
-<div class="dash-check">
-  <div class="dash-yes"><b>可以写</b><div>原始 ASR 口径下，收益在 ±7pp 内保留、未见侵蚀</div><div>安全模型第一个 epoch 变安全（−3.8pp, p=0.018）</div><div>同分布能力大幅提升（+28.8pp）</div><div>过度拒绝没有明显代价（3–5%）</div></div>
-  <div class="dash-no"><b>不能写</b><div>“安全收益完全不受影响” / “严格等价”</div><div>“编程 SFT 提升了对齐 / 让模型更安全”</div><div>“通用编程能力提升”</div><div>“零过度拒绝”</div></div>
+<h2>06 讨论 <span>六个需要一起想清楚的问题</span></h2>
+<div class="dash-topics">
+  <div class="dash-topic">
+    <div class="num">A1 · 结论口径</div>
+    <h3>主结论用原始 ASR，还是长度对齐后的 ASR？</h3>
+    <p>原始 ASR 是预注册主终点，E1–E3 的 TOST 全过；长度对齐后点估计仍为正，但 E2 的 90% 上界 7.5pp 超界，五档分箱三档全不过。把长度调整升成主终点，等于改问“同等篇幅下是否更少有害细节”——这是一个更窄、也更难回答的问题。</p>
+    <div class="q">拍板：raw ASR 主报、长度作 sensitivity（推荐），还是设双主终点？</div>
+  </div>
+  <div class="dash-topic">
+    <div class="num">A2 · 收益定义</div>
+    <h3>“更短、更常短拒答”算不算安全收益？</h3>
+    <p>如果 S1 的优势主要来自回答更短、更常短拒答，它在部署上仍是安全行为（用户拿不到可操作细节）；但它和“同等篇幅下更少有害内容”不是同一种能力。XSTest 过度拒绝只有 3–5%，说明代价不高；真正的风险是这种收益能否迁移到别的攻击分布。</p>
+    <div class="q">讨论：我们在论文里要不要区分 refusal propensity 与 harm reduction？</div>
+  </div>
+  <div class="dash-topic">
+    <div class="num">A3 · 内容审计</div>
+    <h3>怎么证明“长回答真的更少可操作细节”？</h3>
+    <p>抽 E0/E3 各 100 条“&gt;1500 字符且未拒答”样本做盲评，编码四件事：是否给出可执行步骤、是否具体到参数/工具、拒绝是否只是开头套话、是否含安全免责声明。两人独立编码并报 Cohen's κ；如果同长度内确实更少可操作细节，“SFT 让模型更安全”才站得住。</p>
+    <div class="q">拍板：谁来做、本周能否完成、编码表用哪一版？</div>
+  </div>
+  <div class="dash-topic">
+    <div class="num">B1 · 种子复现</div>
+    <h3>第二 seed 值不值得现在跑？</h3>
+    <p>单 seed 是目前最大的外部效度缺口。第二 seed 不必重跑全部：只复现主终点（训练 + HarmBench/LCB DEV），长度分析可直接用落盘输出补。若两个 seed 的 ΔG 方向不一致，主结论要降级为“seed-dependent”，而不是继续写“保留”。</p>
+    <div class="q">讨论：预算/卡时是否允许？只复现主终点，还是连长度分析一起？</div>
+  </div>
+  <div class="dash-topic">
+    <div class="num">B2 · 判官稳健性</div>
+    <h3>单一 13B judge 会不会把“长度”当成“危害”？</h3>
+    <p>ASR 与回答长度强相关，但“判官本身对长度敏感”尚未验证：可能是长回答确实更可操作，也可能是 judge 看到更多细节就更容易判成功。抽 200 条按行为分层，用第二判官盲评，报 Cohen's κ 与两种判官下的 ASR 差值；κ&lt;0.6 时所有 ASR 结论都要加不确定性说明。</p>
+    <div class="q">讨论：第二判官用哪个模型/API？200 条够不够？</div>
+  </div>
+  <div class="dash-topic">
+    <div class="num">B3 · G5 与交付</div>
+    <h3>TEST 跑完之后，交给写论文的人什么？</h3>
+    <p>G5 要跑 LCB TEST 182 题 × 8 状态 + M0/E0 的 DEV anchor 复跑：anchor 排除环境漂移，TEST 回答“DEV 上的结论是不是题集特性”。论文由合作者主笔，我们需要交付主表（ASR/能力/长度）、三张主图和“必须一起报的限制清单”，避免对方写出数据支持不了的句子。</p>
+    <div class="q">拍板：G5 本周是否跑完？交付清单谁维护？</div>
+  </div>
 </div>
 
-<h2>07 今晚讨论 <span>先拍板，再排期</span></h2>
-<div class="dash-grid3 dash-discuss">
-  <div class="dash-card">
-    <h3>🎯 今晚拍板</h3>
-    <ul>
-      <li><b>主结论</b>：raw ASR 主报，长度作 sensitivity？</li>
-      <li><b>收益定义</b>：更短、更常短拒答，算安全吗？</li>
-      <li><b>对外</b>：“保留 + brevity”这一版？</li>
-    </ul>
-  </div>
-  <div class="dash-card">
-    <h3>🔬 机制验证</h3>
-    <ul>
-      <li>100 条“长且未拒答”内容审计</li>
-      <li>200 条双判官 κ</li>
-      <li>长度分析写进 SAP（§8.5）</li>
-    </ul>
-  </div>
-  <div class="dash-card">
-    <h3>🗓 排期</h3>
-    <ul>
-      <li>G5：TEST 182 题 + anchor</li>
-      <li>第二 seed：预算/时间？</li>
-      <li>补 ASR / 能力 / 长度三张主图</li>
-    </ul>
-  </div>
-</div>
-
-<h2>08 已知限制</h2>
+<h2>07 已知限制</h2>
 <div class="dash-card">
   <div class="dash-pills" style="margin-top:0">
     <span class="dash-pill warn">单 seed</span>
