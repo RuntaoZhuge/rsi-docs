@@ -146,7 +146,7 @@
       <b>长度对齐后 G(0)：13.6 → 4.2–5.6pp</b><br><br>
       超过一半的“安全优势”来自 S1 更短、更常短拒答，而不是同等篇幅下更少有害细节。<br><br>
       拒答率本身没升：S1 73.3%→74.6%，M0 53.5%→52.0%。<br><br>
-      <span style="color:var(--dash-amber);font-weight:700">所以不能写“SFT 提升了对齐/安全”。</span>
+      <span style="color:var(--dash-amber);font-weight:700">这更像“回答变短”的副作用，而不是对齐变好。</span>
     </div>
   </div>
 </div>
@@ -177,7 +177,7 @@
         <circle cx="520.3" cy="184" r="6" fill="#d97706"/>
       </g>
     </svg>
-    <div class="dash-cap">同一批数据，换一种长度分箱，等价判定就翻转：结论只能写“未见侵蚀”，不能写“严格等价”。</div>
+    <div class="dash-cap">同一批数据，换一种长度分箱，等价判定就翻转：严格等价不稳健，能确认的只是“未见侵蚀”。</div>
   </div>
   <div class="dash-card">
     <div class="dash-note">
