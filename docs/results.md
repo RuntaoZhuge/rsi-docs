@@ -29,8 +29,8 @@
   <div class="dash-dumb">
     <div class="dash-dumb-label">LCB 365<small>S1 · 8.5 → 6.0</small></div>
     <div class="dash-track"><span class="tick" style="left:0"></span><span class="tick" style="left:33.3%"></span><span class="tick" style="left:66.7%"></span><span class="tick" style="left:100%"></span>
-      <span class="line" style="left:10%;width:4.2%;background:#2a9d8f;opacity:.35"></span><span class="dot start" style="left:14.2%"></span><span class="dot end" style="left:10%"></span></div>
-    <div class="dash-dumb-val" style="color:var(--dash-muted)">格式崩塌*</div>
+      <span class="line" style="left:14.2%;width:10.5%;background:#2a9d8f"></span><span class="dot start" style="left:14.2%"></span><span class="dot end" style="left:24.7%"></span></div>
+    <div class="dash-dumb-val" style="color:#2a9d8f">+6.3pp</div>
   </div>
   <div class="dash-scale"><div></div><div class="track"><span>0%</span><span>20%</span><span>40%</span><span>60%</span></div><div></div></div>
   <div class="dash-cap">灰点 = 训练前，彩点 = 训练后。数值同下表；*见文末说明。</div>
@@ -41,7 +41,7 @@
 | `M0` | KodCode VALID（500 题，同分布） | 26.8% | **55.6%** | **+28.8pp** | `eval/M0/E0/kc_scored.jsonl` → `eval/M0/E3/kc_scored.jsonl` |
 | `M0` | LCB DEV+TEST（365 题，独立） | 9.3% | **14.5%** | **+5.2pp** | `eval/M0/E0/lcb_dev_scored.jsonl` + `eval/M0/T0/lcb_test_scored.jsonl` → 同结构 E3/T3 |
 | `S1` | KodCode VALID（500 题，同分布） | 27.0% | **55.4%** | **+28.4pp** | `eval/S1/E0/kc_scored.jsonl` → `eval/S1/E3/kc_scored.jsonl` |
-| `S1` | LCB DEV+TEST（365 题，独立） | 8.5% | 6.0% | −2.5pp | `eval/S1/E0/…` + `eval/S1/T0/…` → E3/T3 |
+| `S1` | LCB DEV+TEST（365 题，独立） | 8.5% | **14.8%** | **+6.3pp** | `eval/S1/E0_plain/…` + `eval/S1/T0_plain/…` → E3/T3 |
 
 **怎么算的**
 
@@ -60,8 +60,15 @@ pass@1 = 该状态 passed=true 的题数 / 总题数
 
 `S2`（AdvGame）/ `S3`（MAGIC）未运行——两者都需按论文重训安全阶段，没有安排算力。
 
-**\* 关于 `S1` 的 LCB 卡片**：它的 thinking 输出在 SFT 后退化（含完整代码块的比例 100% → 30%），
-LCB 解析不到代码，所以那张卡测的是格式而非能力。同一条数据在 plain 模式下是 7.1% → 12.6%（+5.5pp，G3 试训规模）。
+**关于 `S1` 的口径**：早期用 thinking 模式测 LCB 时，它的输出格式在 SFT 后退化（含完整代码块 100% → 30%），
+分数塌到 6.0%，看起来像能力下降。改用 **plain 模式重测**后是 **8.5% → 14.8%（+6.3pp）**，与 `M0` 的 +5.2pp 基本一致。
+即：两个模型的代码能力提升幅度相当，之前那个"下降"是评测格式造成的假象。
+
+| `S1` plain 逐轮 | T0 | T1 | T2 | T3 |
+|---|---:|---:|---:|---:|
+| LCB DEV | 7.1% | 10.4% | 10.4% | 10.4% |
+| LCB TEST | 9.9% | 16.5% | 18.7% | 19.2% |
+| 合并 365 | 8.5% | 13.4% | 14.5% | **14.8%** |
 
 ---
 
@@ -125,9 +132,9 @@ R(t)   = G(t) / G(0)               G(0) 很小或为负时不解释比值
 
 | | |
 |---|---|
-| 下载 | [`eval_seed1.tar.gz`](assets/data/eval_seed1.tar.gz)（11 MB） |
-| 内容 | **109 个逐题文件、44,885 条记录**（生成 + 判定） |
-| 校验 | `637f3ceed03b6014a02f5d2ff6ec2459c48a8ce0912cb0c5dca29fecaba56e23`（[sha256 文件](assets/data/eval_seed1.tar.gz.sha256)） |
+| 下载 | [`eval_seed1.tar.gz`](assets/data/eval_seed1.tar.gz)（12 MB） |
+| 内容 | **123 个逐题文件、47,439 条记录**（生成 + 判定） |
+| 校验 | `e40f1208d34b6704e12d49ed6e9b1365f0e04a66af1c5752c336f7504e3ec051`（[sha256 文件](assets/data/eval_seed1.tar.gz.sha256)） |
 | 附带 | `MANIFEST.csv`（每个文件行数 + SHA256）、`README.md`（字段字典与判定口径） |
 
 ```bash
