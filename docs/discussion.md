@@ -84,7 +84,7 @@
   <div class="dash-cap">S1 在 E1 变安全（18.1→14.2, p=0.018）；M0 边缘（31.7→27.6, p=0.071）。</div>
 </div>
 
-<h2>03 能力 <span>提升只在训练分布内</span></h2>
+<h2>03 能力 <span>同分布 +28pp，跨分布 +5pp</span></h2>
 <div class="dash-card">
   <div class="dash-dumb">
     <div class="dash-dumb-label">KodCode<small>M0 · 26.8 → 55.6</small></div>
@@ -99,19 +99,21 @@
     <div class="dash-dumb-val" style="color:#2a9d8f">+28.4pp</div>
   </div>
   <div class="dash-dumb">
-    <div class="dash-dumb-label">LCB DEV<small>M0 · 9.8 → 10.4</small></div>
+    <div class="dash-dumb-label">LCB 合并<small>M0 · 9.3 → 14.5</small></div>
     <div class="dash-track"><span class="tick" style="left:0"></span><span class="tick" style="left:33.3%"></span><span class="tick" style="left:66.7%"></span><span class="tick" style="left:100%"></span>
-      <span class="line" style="left:16.3%;width:1%;background:#e05252"></span><span class="dot start" style="left:16.3%"></span><span class="dot end m0" style="left:17.3%"></span></div>
-    <div class="dash-dumb-val" style="color:var(--dash-muted)">+0.5pp</div>
+      <span class="line" style="left:15.5%;width:8.7%;background:#e05252"></span><span class="dot start" style="left:15.5%"></span><span class="dot end m0" style="left:24.2%"></span></div>
+    <div class="dash-dumb-val" style="color:#e05252">+5.2pp</div>
   </div>
   <div class="dash-dumb">
-    <div class="dash-dumb-label">LCB DEV<small>S1 · 6.0 → 6.0</small></div>
+    <div class="dash-dumb-label">LCB 合并<small>S1 · 8.5 → 6.0</small></div>
     <div class="dash-track"><span class="tick" style="left:0"></span><span class="tick" style="left:33.3%"></span><span class="tick" style="left:66.7%"></span><span class="tick" style="left:100%"></span>
-      <span class="dot start" style="left:10%"></span><span class="dot end" style="left:10%"></span></div>
-    <div class="dash-dumb-val" style="color:var(--dash-muted)">0.0pp</div>
+      <span class="line" style="left:10%;width:4.2%;background:#2a9d8f;opacity:.4"></span><span class="dot start" style="left:14.2%"></span><span class="dot end" style="left:10%"></span></div>
+    <div class="dash-dumb-val" style="color:var(--dash-muted)">格式崩塌*</div>
   </div>
   <div class="dash-scale"><div></div><div class="track"><span>0%</span><span>20%</span><span>40%</span><span>60%</span></div><div></div></div>
-  <div class="dash-cap">LCB 分辨率 11.5pp：小于它的变化不能叫“提升”，也不能叫“没提升”。</div>
+  <div class="dash-cap">LCB 合并 DEV+TEST（365 题，分辨率约 8pp）：M0 <b>+5.2pp（p=0.003）</b>，E2 峰值 +7.9pp（p=2.4e-06）。<br>
+单看 DEV（183 题、分辨率 11.5pp）确实看不出提升，那只是分辨率不够，不代表没提升。<br>
+*S1 的数字受输出格式崩塌污染：它的 thinking 输出在 SFT 后退化，LCB 无法解析；plain 模式复评（G3 试训）为 7.1%→12.6%，能力实际是上升的。</div>
 </div>
 
 <h2>04 机制 <span>ASR 下降几乎全部来自“回答变短”</span></h2>
