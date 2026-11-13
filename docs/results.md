@@ -7,6 +7,35 @@
 
 ## 1 能力：同一条 SFT 数据，训练前 → 训练后
 
+<div class="dash-card">
+  <div class="dash-dumb">
+    <div class="dash-dumb-label">KodCode<small>M0 · 26.8 → 55.6</small></div>
+    <div class="dash-track"><span class="tick" style="left:0"></span><span class="tick" style="left:33.3%"></span><span class="tick" style="left:66.7%"></span><span class="tick" style="left:100%"></span>
+      <span class="line" style="left:44.7%;width:48%;background:#e05252"></span><span class="dot start" style="left:44.7%"></span><span class="dot end m0" style="left:92.7%"></span></div>
+    <div class="dash-dumb-val" style="color:#e05252">+28.8pp</div>
+  </div>
+  <div class="dash-dumb">
+    <div class="dash-dumb-label">KodCode<small>S1 · 27.0 → 55.4</small></div>
+    <div class="dash-track"><span class="tick" style="left:0"></span><span class="tick" style="left:33.3%"></span><span class="tick" style="left:66.7%"></span><span class="tick" style="left:100%"></span>
+      <span class="line" style="left:45%;width:47.3%;background:#2a9d8f"></span><span class="dot start" style="left:45%"></span><span class="dot end" style="left:92.3%"></span></div>
+    <div class="dash-dumb-val" style="color:#2a9d8f">+28.4pp</div>
+  </div>
+  <div class="dash-dumb">
+    <div class="dash-dumb-label">LCB 365<small>M0 · 9.3 → 14.5</small></div>
+    <div class="dash-track"><span class="tick" style="left:0"></span><span class="tick" style="left:33.3%"></span><span class="tick" style="left:66.7%"></span><span class="tick" style="left:100%"></span>
+      <span class="line" style="left:15.5%;width:8.7%;background:#e05252"></span><span class="dot start" style="left:15.5%"></span><span class="dot end m0" style="left:24.2%"></span></div>
+    <div class="dash-dumb-val" style="color:#e05252">+5.2pp</div>
+  </div>
+  <div class="dash-dumb">
+    <div class="dash-dumb-label">LCB 365<small>S1 · 8.5 → 6.0</small></div>
+    <div class="dash-track"><span class="tick" style="left:0"></span><span class="tick" style="left:33.3%"></span><span class="tick" style="left:66.7%"></span><span class="tick" style="left:100%"></span>
+      <span class="line" style="left:10%;width:4.2%;background:#2a9d8f;opacity:.35"></span><span class="dot start" style="left:14.2%"></span><span class="dot end" style="left:10%"></span></div>
+    <div class="dash-dumb-val" style="color:var(--dash-muted)">格式崩塌*</div>
+  </div>
+  <div class="dash-scale"><div></div><div class="track"><span>0%</span><span>20%</span><span>40%</span><span>60%</span></div><div></div></div>
+  <div class="dash-cap">灰点 = 训练前，彩点 = 训练后。数值同下表；*见文末说明。</div>
+</div>
+
 | 模型 | 基准 | 训练前 | 训练后 | 变化 | 原始文件（前 → 后） |
 |---|---|---:|---:|---:|---|
 | `M0` | KodCode VALID（500 题，同分布） | 26.8% | **55.6%** | **+28.8pp** | `eval/M0/E0/kc_scored.jsonl` → `eval/M0/E3/kc_scored.jsonl` |
@@ -31,9 +60,35 @@ pass@1 = 该状态 passed=true 的题数 / 总题数
 
 `S2`（AdvGame）/ `S3`（MAGIC）未运行——两者都需按论文重训安全阶段，没有安排算力。
 
+**\* 关于 `S1` 的 LCB 卡片**：它的 thinking 输出在 SFT 后退化（含完整代码块的比例 100% → 30%），
+LCB 解析不到代码，所以那张卡测的是格式而非能力。同一条数据在 plain 模式下是 7.1% → 12.6%（+5.5pp，G3 试训规模）。
+
 ---
 
 ## 2 安全：能力提升前后的攻击成功率
+
+<div class="dash-card">
+  <div class="dash-dumb">
+    <div class="dash-dumb-label">ASR<small>M0 分支 · 31.7 → 29.2</small></div>
+    <div class="dash-track"><span class="tick" style="left:0"></span><span class="tick" style="left:25%"></span><span class="tick" style="left:50%"></span><span class="tick" style="left:75%"></span>
+      <span class="line" style="left:73%;width:6.3%;background:#e05252;opacity:.5"></span><span class="dot start m0" style="left:79.3%"></span><span class="dot end m0" style="left:73%"></span></div>
+    <div class="dash-dumb-val" style="color:#e05252">−2.5pp</div>
+  </div>
+  <div class="dash-dumb">
+    <div class="dash-dumb-label">ASR<small>S1 分支 · 18.1 → 13.1</small></div>
+    <div class="dash-track"><span class="tick" style="left:0"></span><span class="tick" style="left:25%"></span><span class="tick" style="left:50%"></span><span class="tick" style="left:75%"></span>
+      <span class="line" style="left:32.8%;width:12.5%;background:#2a9d8f;opacity:.5"></span><span class="dot start" style="left:45.3%"></span><span class="dot end" style="left:32.8%"></span></div>
+    <div class="dash-dumb-val" style="color:#2a9d8f">−5.0pp</div>
+  </div>
+  <div class="dash-dumb">
+    <div class="dash-dumb-label">G(t)<small>安全差距 · 13.6 → 16.1</small></div>
+    <div class="dash-track"><span class="tick" style="left:0"></span><span class="tick" style="left:25%"></span><span class="tick" style="left:50%"></span><span class="tick" style="left:75%"></span>
+      <span class="line" style="left:34%;width:6.3%;background:var(--dash-m0)"></span><span class="dot start" style="left:34%"></span><span class="dot end m0" style="left:40.3%"></span></div>
+    <div class="dash-dumb-val" style="color:var(--dash-m0)">+2.5pp</div>
+  </div>
+  <div class="dash-scale"><div></div><div class="track"><span>0%</span><span>10%</span><span>20%</span><span>30%</span><span>40%</span></div><div></div></div>
+  <div class="dash-cap">ASR 越低越安全；G(t) 是两个分支之差（pp），越高表示安全模型的优势越大。</div>
+</div>
 
 | 状态 | `ASR(M0 分支)` | `ASR(S1 分支)` | `G(t) = B − C` | 原始文件 |
 |---|---:|---:|---:|---|
