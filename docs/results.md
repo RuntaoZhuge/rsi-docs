@@ -23,6 +23,33 @@
 
 ---
 
+## 1.5 一句话结果
+
+| 问题 | 答案 |
+|---|---|
+| 能力有没有提升？ | **提升**。同分布 KodCode 翻倍（+28pp）；独立基准 LCB 合并 +5.2pp（p=0.003） |
+| 提升之后安全怎样？ | **收益保留**。`G(t)` 13.6 → 16.1pp，TOST 三个 epoch 全通过，安全模型自身还更安全了 |
+| 有没有第三种安全方法？ | **没有**。只跑了 S1（Self-RedTeam）；S2/S3 需要重训，未安排资源（见 §7 第 8 条） |
+
+---
+
+## 1.6 能力前后对比（核心表）
+
+同一条 SFT 数据、同一套超参，只换起点模型；`E0` = 未训练，`E3` = 3 个 epoch 后。
+
+| 模型 | 基准 | SFT 前 | SFT 后 | Δ | 检验 |
+|---|---|---:|---:|---:|---|
+| `M0` | KodCode VALID（同分布） | 26.8% | **55.6%** | **+28.8pp** | p<1e-27 |
+| `M0` | LCB DEV+TEST（独立，365 题） | 9.3% | **14.5%** | **+5.2pp** | p=0.003（峰值 E2 +7.9pp） |
+| `S1` | KodCode VALID（同分布） | 27.0% | **55.4%** | **+28.4pp** | p<1e-27 |
+| `S1` | LCB DEV+TEST | 8.5% | 6.0% | −2.5pp | 受格式崩塌污染，不作结论 |
+| `S1` | LCB DEV（plain 模式，G3 试训规模） | 7.1% | 12.6% | +5.5pp | 1,000 条 × 1 epoch |
+
+- **S2（AdvGame）/ S3（MAGIC）没有跑**：两者都需要按论文重训安全阶段，未获得相应算力与时间；
+  任务书允许「方法数少于 3 时写明原因」，这里如实记录，不用别的基座凑数。
+- `S1` 的 LCB 一行用 `—` 处理更诚实：它的 thinking 输出在 SFT 后退化，LCB 解析不到代码，
+  所以那个 −2.5pp 测的是格式，不是能力（详见 §6.4 与 §6.5）。
+
 ## 2. 运行环境（摘要）
 
 实际执行环境、依赖钉版与全部偏离记录见《[执行环境与进度](environment.md)》。
@@ -231,7 +258,9 @@ HarmBench ASR 与判官看到的文本长度强相关：<400 字符的回答 85�
 5. **判题文本口径**：thinking 模型只判 `<answer>`，全文判定会让 ASR 高约 6pp；
 6. **长度/拒答混杂**：ASR 与回答长度强相关；长度标准化后基线差距缩至 4.2–5.6pp，
    ±7pp 等价在调整后不稳健（见 6.2、D15）；
-7. **G3 未按任务书测 LCB DEV**：G3 只用了 KodCode VALID 判定通过（判据允许「或」，
+7. **只跑了 1 种安全方法**：S1（Self-RedTeam）；S2（AdvGame）、S3（MAGIC）需按论文重训，未安排资源，
+   因此"收益保留"这一结论目前只在 S1 上成立，不能推及所有动态安全改进方法；
+8. **G3 未按任务书测 LCB DEV**：G3 只用了 KodCode VALID 判定通过（判据允许「或」，
    实测 +22.2/+23.2pp 远超阈值），但任务书 §5 还要求记录 LCB DEV 的试训前后对比，当时遗漏；
    补测结果见 §6.5（D16）。
 
@@ -249,4 +278,25 @@ HarmBench ASR 与判官看到的文本长度强相关：<400 字符的回答 85�
 | `analysis/length_{summary,bins,decomp,standardized}.csv`、`length_report.md` | 长度/拒答敏感性分析（事后，D15） |
 | `eval/<MODEL>/<E>/xstest_scored.jsonl` | XSTest 逐题判读（只统计 safe 250 题） |
 | `run_log.csv` | 每次运行的起止时间、命令、产出文件与合并 SHA256 |
-| `deviations.md` | 全部协议偏离（D1–D15） |
+| `deviations.md` | 全部协议偏离（D1–D16） |
+
+---
+
+## 9. 原始数据下载
+
+全部逐题原始输出与判定打包如下（**109 个文件、44,885 条记录、11 MB**）：
+
+| 文件 | 大小 | 校验 |
+|---|---:|---|
+| [eval_seed1.tar.gz](assets/data/eval_seed1.tar.gz) | 11 MB | `637f3cee…6e23`（[sha256](assets/data/eval_seed1.tar.gz.sha256)） |
+
+包内结构：`eval/<MODEL>/<STAGE>/<benchmark>.jsonl`，外加 `MANIFEST.csv`（每个文件的行数与 SHA256）
+和 `README.md`（字段字典与判定口径）。
+
+```bash
+curl -LO https://runtaozhuge.github.io/rsi-docs/assets/data/eval_seed1.tar.gz
+shasum -a 256 eval_seed1.tar.gz   # 应等于 637f3ceed03b6014a02f5d2ff6ec2459c48a8ce0912cb0c5dca29fecaba56e23
+tar xzf eval_seed1.tar.gz
+```
+
+**不含**：模型权重（30 GB）与 13B 判官权重，二者按各自 license 从原仓库获取。
