@@ -3,13 +3,14 @@
 本页记录训练与评测实际跑的机器环境、已经验证过的链路，以及主链和扩展分支走到哪一步。
 **不含实测研究结果**——结果统一发布在《[实验进展与结果](results.md)》。
 
-最后更新：2026-11-24
+最后更新：2026-11-25
 
 !!! info "一句话现状"
 
     运行环境与工具链已全部跑通。**seed-1 主链 G0–G5 已完成**（M0/S1 的 LoRA 更新、逐 epoch 评估、
-    LCB TEST 与锚点复跑）；**MAGIC（S3）U 阶段的 DEV 期 E0–E3 也已完成**。
-    当前只剩 MAGIC 的 LCB TEST（T0–T3）与一项 adapter 路径一致性检查，均需有卡实例。
+    LCB TEST 与锚点复跑）；**MAGIC（S3）U 阶段的 DEV + LCB TEST 也已完成**，
+    推理路径已统一为未合并 adapter，D17 关闭。
+    当前没有待跑实验，只剩第二 seed（资源允许时复现）与 S2（平台不可行）。
 
 ---
 
@@ -73,13 +74,13 @@
 | 真人训练：0.5B 模型 20 步 LoRA | ✅ `train_loss=0.187`，adapter 正常落盘 |
 | 7B 基座（`M0`/`S1`/`MAGIC`）加载 | ✅ 三个 15GB 权重均可加载，bf16 可用 |
 | 7B 生成（HarmBench 提示） | ✅ 单卡多路生成；HarmBench 400 行为 × n=3 |
-| HarmBench 官方 13B classifier 判题 | ✅ 25GB 判官已下载；主链 8 个状态 + MAGIC 4 个状态全部判完 |
+| HarmBench 官方 13B classifier 判题 | ✅ 25GB 判官已下载；主链 8 个状态 + MAGIC 8 个状态全部判完 |
 | LiveCodeBench DEV / TEST | ✅ 183 / 182 题，与冻结清单一致；官方 codegen 判题 |
 | KodCode 10K 上传与校验 | ✅ 9,500 / 500 / 1,000 |
 | XSTest | ✅ 450 条提示，只统计 250 条 safe |
 | 正式 LoRA 更新（3 epoch） | ✅ 3,564 步，M0/S1 双分支并行，墙钟 3h15m |
 | MAGIC LoRA 更新（3 epoch） | ✅ 3,564 步，墙钟 3h30m，`train_loss=0.153` |
-| adapter 挂载 / 合并两条推理路径 | ✅ 均可用；MAGIC 的合并路径见偏离 D17 |
+| adapter 挂载 / 合并两条推理路径 | ✅ 均可用；MAGIC 主结果已统一为未合并，合并版仅作 D17 审计 |
 | LCB 代码**执行**判题 | ✅ 在本机 Docker；GPU 容器内直接执行返回 `-4 Runtime Error` |
 
 ### 4.1 环境侧已解决的主要问题
@@ -111,6 +112,8 @@
 | G4 合计 | 训练 + 三轮评估 | **15h38m** | 不含排队与空转 |
 | MAGIC 训练 | KodCode 9,500 × 3 epoch | 3h30m | 单分支 |
 | MAGIC 评估 | E1–E3 各一轮四套评测 | 约 3h | 次日串行 |
+| MAGIC TEST | T0–T3，两两并行 | 1h16m | 2026-11-24 |
+| MAGIC D17 复跑 | E1/E2 未合并并行 + E3 单跑 | 3h05m / 3h16m | 2026-11-24 |
 
 步骤状态：
 
@@ -130,21 +133,17 @@
 | S12 | 逐 epoch 评估 | ✅ 2026-11-11 |
 | S13 | G5 汇总分析（LCB TEST + 锚点） | ✅ 2026-11-13 |
 | S14 | MAGIC（S3）U 阶段 DEV 期 | ✅ 2026-11-19/20 |
-| S15 | MAGIC LCB TEST（T0–T3） | ⏳ 待有卡实例，约 2h |
-| S16 | D17 一致性检查（E3 未合并路径复跑） | ⏳ 待有卡实例，约 1h |
-| S17 | 第二 seed | ❌ 未运行（见 §7） |
+| S15 | MAGIC LCB TEST（T0–T3） | ✅ 2026-11-24 |
+| S16 | D17 一致性检查（E1–E3 未合并复跑） | ✅ 2026-11-25，D17 关闭 |
+| S17 | 第二 seed | ❌ 未运行（见 §6） |
 | S18 | S2（AdvGame） | ❌ 平台不可行（见 §7） |
 
 ---
 
 ## 6. 下一步
 
-1. **MAGIC LCB TEST**：`run_magic_g5.sh` 已就绪，T0+T1、T2+T3 两两并行，约 2 小时；
-   跑完后才能把 MAGIC 的 LCB 从「DEV 单窗、低于分辨率」升级为「DEV+TEST 365 题」。
-2. **D17 一致性检查**：MAGIC 的 E1–E3 用了 `--merge-adapter`，M0/S1 未合并；
-   用未合并路径复跑 E3（HarmBench + KodCode + LCB DEV，约 1 小时），差异 <1pp 即判定可忽略。
-3. **第二 seed**：主链结论目前是单 seed，资源允许时应复现一次。
-4. **S2（AdvGame）**：官方训练栈依赖 CUDA 版 torch、Slurm/Ray 与多节点，当前 DCU 平台不可行；
+1. **第二 seed**：主链与 MAGIC 的结论目前都是单 seed，资源允许时应各复现一次。
+2. **S2（AdvGame）**：官方训练栈依赖 CUDA 版 torch、Slurm/Ray 与多节点，当前 DCU 平台不可行；
    已写 `S2_FEASIBILITY.md` 记录原因，不用别的基座凑数。
 
 !!! note "资产位置"

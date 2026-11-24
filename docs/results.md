@@ -42,6 +42,8 @@
 | `M0` | LCB DEV+TEST（365 题，独立） | 9.3% | **14.5%** | **+5.2pp** | `eval/M0/E0/lcb_dev_scored.jsonl` + `eval/M0/T0/lcb_test_scored.jsonl` → 同结构 E3/T3 |
 | `S1` | KodCode VALID（500 题，同分布） | 27.0% | **55.4%** | **+28.4pp** | `eval/S1/E0/kc_scored.jsonl` → `eval/S1/E3/kc_scored.jsonl` |
 | `S1` | LCB DEV+TEST（365 题，独立） | 8.5% | **14.8%** | **+6.3pp** | `eval/S1/E0_plain/…` + `eval/S1/T0_plain/…` → E3/T3 |
+| `MAGIC` | KodCode VALID（500 题，同分布） | 26.0% | **55.4%** | **+29.4pp** | `eval/MAGIC/E0/kc_scored.jsonl` → `eval/MAGIC/E3/kc_scored.jsonl` |
+| `MAGIC` | LCB DEV+TEST（365 题，独立） | 7.9% | **15.1%** | **+7.1pp** | `eval/MAGIC/E0/…` + `eval/MAGIC/T0/…` → E3/T3 |
 
 **怎么算的**
 
@@ -59,7 +61,7 @@ pass@1 = 该状态 passed=true 的题数 / 总题数
 > 证据文件：`eval/S1/E0_plain/lcb_dev_scored.jsonl`、`eval/S1/pilot/lcb_dev_plain_scored.jsonl`。
 
 `S2`（AdvGame）未运行——需要按论文重训安全阶段，当前 DCU 平台不可行（见详细结果）。
-`S3`（MAGIC）已完成 U 阶段的 DEV 期评估（E0–E3）；LCB TEST 尚未跑，见 §3。
+`S3`（MAGIC）已完成 U 阶段的 DEV + LCB TEST 评估（E0–E3 / T0–T3），见 §3。
 
 **关于 `S1` 的口径**：早期用 thinking 模式测 LCB 时，它的输出格式在 SFT 后退化（含完整代码块 100% → 30%），
 分数塌到 6.0%，看起来像能力下降。改用 **plain 模式重测**后是 **8.5% → 14.8%（+6.3pp）**，与 `M0` 的 +5.2pp 基本一致。
@@ -135,31 +137,33 @@ MAGIC 的 U 阶段与 S1 使用**完全同一套** KodCode LoRA-SFT（rank 8 / l
 只把起点换成 `XiaoyuWen/MAGIC-Qwen2.5-7B-Instruct`。它的 E0 安全水平（18.0%）与 S1（18.1%）几乎相同，
 因此可以直接比较「同一起点水平下，两种安全方法的收益在能力更新后是否都保留」。
 
-| 状态 | `ASR(MAGIC 分支)` | `KodCode VALID` | `LCB DEV` | `XSTest 过度拒绝` |
-|---|---:|---:|---:|---:|
-| E0 | 18.0% | 26.0% | 6.0% | 6.8% |
-| E1 | 14.3% | 54.4% | 9.3% | 3.6% |
-| E2 | 16.2% | 56.2% | 9.8% | 4.8% |
-| E3 | 14.1% | 55.2% | 12.0% | 6.0% |
+| 状态 | `ASR(MAGIC 分支)` | `KodCode VALID` | `LCB DEV` | `LCB TEST` | `LCB DEV+TEST` | `XSTest 过度拒绝` |
+|---|---:|---:|---:|---:|---:|---:|
+| E0 | 18.0% | 26.0% | 6.0% | 9.9% | 7.9% | 6.8% |
+| E1 | 14.8% | 54.4% | 11.5% | 15.9% | 13.7% | 4.0% |
+| E2 | 15.4% | 55.4% | 10.9% | 17.0% | 14.0% | 4.8% |
+| E3 | 13.3% | 55.4% | 13.1% | 17.0% | **15.1%** | 6.8% |
 
 `G_MAGIC(t) = ASR(M0/B_t) − ASR(MAGIC/D_t)`：
 
 | t | `ASR(M0/B_t)` | `ASR(MAGIC/D_t)` | `G_MAGIC(t)` | `ΔG` | 90% CI | TOST ±7pp |
 |---:|---:|---:|---:|---:|---|---|
 | 0 | 31.7% | 18.0% | **13.7pp** | — | — | — |
-| 1 | 27.6% | 14.3% | 13.2pp | −0.4 | [−3.9, +3.2] | 通过 |
-| 2 | 28.1% | 16.2% | 11.9pp | −1.7 | [−5.2, +1.5] | 通过 |
-| 3 | 29.2% | 14.1% | **15.1pp** | +1.4 | [−1.8, +4.8] | 通过 |
+| 1 | 27.6% | 14.8% | 12.8pp | −0.8 | [−4.5, +2.7] | 通过 |
+| 2 | 28.1% | 15.4% | 12.7pp | −1.0 | [−4.3, +2.4] | 通过 |
+| 3 | 29.2% | 13.3% | **15.8pp** | +2.2 | [−0.9, +5.3] | 通过 |
 
-**结论**：与 S1 同向——安全收益在 ±7pp 内保留，MAGIC 自身 ASR 也从 18.0% 降到 14.1%；
-KodCode 同分布 **+29.2pp**，与 M0/S1 的 +28.4~28.8pp 同量级。
+**结论**：与 S1 同向——安全收益在 ±7pp 内保留，MAGIC 自身 ASR 也从 18.0% 降到 13.3%；
+KodCode 同分布 **+29.4pp**，与 M0/S1 的 +28.4~28.8pp 同量级。
+LCB DEV+TEST（365 题）**7.9% → 15.1%，+7.1pp**（配对 McNemar 33 得 / 7 失，p=4.2e-5），
+与 M0 的 +5.2pp、S1 的 +6.3pp 同向且量级相当。
 
-**还没做**：MAGIC 的 LCB TEST（182 题，T0–T3）尚未运行，因此上表的 LCB DEV +6.0pp
-仍低于 183 题的分辨率（约 11.5pp），**不能据此写「独立基准能力提升」**；
-TEST 跑完后才能做 DEV+TEST 合并分析。另外 E1–E3 生成使用了合并后的 adapter，
-与 M0/S1 的未合并路径存在一处推理差异（D17），待一致性检查。
+> E1–E3 已统一为与 M0/S1 相同的**未合并 adapter** 推理路径。旧合并版保留在
+> `eval/MAGIC/E{1,2,3}_merged/`；两版的 HarmBench / KodCode / XSTest 差异 ≤0.8pp，
+> LCB DEV 未合并略高 1.1–2.2pp（见 D17）。
 
-产物：`eval/MAGIC/E0..E3/`、`analysis/magic_report.md`、`analysis/magic_gchange.csv`。
+产物：`eval/MAGIC/E0..E3/`、`eval/MAGIC/T0..T3/`、`analysis/magic_report.md`、
+`analysis/magic_gchange.csv`、`analysis/magic_d17_compare.csv`。
 
 ---
 
@@ -192,19 +196,20 @@ eval/<MODEL>/<STAGE>/<benchmark>.jsonl
 
 ### MAGIC（S3）单独打包
 
-`eval_seed1.tar.gz` 只包含 M0/S1。MAGIC 的 E0–E3 逐题文件单独打包：
+`eval_seed1.tar.gz` 只包含 M0/S1。MAGIC 的 DEV + TEST 逐题文件单独打包：
 
 | | |
 |---|---|
-| 下载 | [`eval_magic.tar.gz`](assets/data/eval_magic.tar.gz)（3.9 MB） |
-| 内容 | **66 个文件**：MAGIC E0–E3 的生成、判定与日志 |
-| 校验 | `125f8dd7c93cfa93e5dc718fcaa2718950c38a984235d8dbbb23607a06c77ff5`（[sha256 文件](assets/data/eval_magic.tar.gz.sha256)） |
+| 下载 | [`eval_magic.tar.gz`](assets/data/eval_magic.tar.gz)（6.9 MB） |
+| 内容 | **133 个文件**：MAGIC E0–E3 / T0–T3 的生成、判定与日志，外加合并版审计数据 |
+| 校验 | `bacadbac03aef73e70a5142f8775dcfdd0449cb69c0ebc792f8d9d7fe9368dbc`（[sha256 文件](assets/data/eval_magic.tar.gz.sha256)） |
 
 ```bash
 curl -LO https://runtaozhuge.github.io/rsi-docs/assets/data/eval_magic.tar.gz
 shasum -a 256 eval_magic.tar.gz    # 应等于上面那串
-tar xzf eval_magic.tar.gz          # 解出 MAGIC/E0..E3/
+tar xzf eval_magic.tar.gz          # 解出 MAGIC/E0..E3、T0..T3
 ```
 
-包内路径 `MAGIC/E<t>/`，外加 `MANIFEST.csv`（行数 + SHA256）与 `README.md`（协议与口径）。
-不含 MAGIC 的 LCB TEST（尚未运行）与模型权重。
+包内路径 `MAGIC/E<t>/`、`MAGIC/T<t>/`，外加 `MAGIC/audit_merged/`（D17 的合并版 E1–E3）、
+`D17_COMPARE.md`、`MANIFEST.csv`（行数 + SHA256）与 `README.md`（协议与口径）。
+不含模型权重。
