@@ -1,7 +1,7 @@
 # 详细结果与计算口径
 
 > 这是《[结果](results.md)》的完整版：含 G1–G5 逐轮数据、等价检验、格式诊断与全部限制。
-> 主结果页只保留三块核心数据。
+> 主结果页只保留四块核心数据。
 
 
 本页发布 G1–G4 的**实测结果**。所有数字都来自可追溯的逐题原始文件（每个状态 1,200 条 HarmBench、183 题 LCB、500 题 KodCode、450 条 XSTest），
@@ -33,7 +33,7 @@
 |---|---|
 | 能力有没有提升？ | **提升**。同分布 KodCode 翻倍（+28pp）；独立基准 LCB 合并 +5.2pp（p=0.003） |
 | 提升之后安全怎样？ | **收益保留**。`G(t)` 13.6 → 16.1pp，TOST 三个 epoch 全通过，安全模型自身还更安全了 |
-| 有没有第三种安全方法？ | **没有**。只跑了 S1（Self-RedTeam）；S2/S3 需要重训，未安排资源（见 §7 第 8 条） |
+| 有没有第三种安全方法？ | **有第二种**。MAGIC（S3）已完成 U 阶段的 DEV 期（E0–E3），TEST 待补；S2（AdvGame）因平台限制未跑（见 §7 第 7 条） |
 
 ---
 
@@ -46,13 +46,15 @@
 | `M0` | KodCode VALID（同分布） | 26.8% | **55.6%** | **+28.8pp** | p<1e-27 |
 | `M0` | LCB DEV+TEST（独立，365 题） | 9.3% | **14.5%** | **+5.2pp** | p=0.003（峰值 E2 +7.9pp） |
 | `S1` | KodCode VALID（同分布） | 27.0% | **55.4%** | **+28.4pp** | p<1e-27 |
-| `S1` | LCB DEV+TEST | 8.5% | 6.0% | −2.5pp | 受格式崩塌污染，不作结论 |
-| `S1` | LCB DEV（plain 模式，G3 试训规模） | 7.1% | 12.6% | +5.5pp | 1,000 条 × 1 epoch |
+| `S1` | LCB DEV+TEST（plain，365 题） | 8.5% | **14.8%** | **+6.3pp** | 与 M0 的 +5.2pp 相当 |
+| `MAGIC` | KodCode VALID（同分布） | 26.0% | **55.2%** | **+29.2pp** | 与 M0/S1 同量级 |
+| `MAGIC` | LCB DEV（plain，183 题） | 6.0% | **12.0%** | **+6.0pp** | 低于 11.5pp 分辨率；TEST 待跑 |
 
-- **S2（AdvGame）/ S3（MAGIC）没有跑**：两者都需要按论文重训安全阶段，未获得相应算力与时间；
-  任务书允许「方法数少于 3 时写明原因」，这里如实记录，不用别的基座凑数。
-- `S1` 的 LCB 一行用 `—` 处理更诚实：它的 thinking 输出在 SFT 后退化，LCB 解析不到代码，
-  所以那个 −2.5pp 测的是格式，不是能力（详见 §6.4 与 §6.5）。
+- **S2（AdvGame）没有跑**：官方训练栈依赖 CUDA 版 torch、Slurm/Ray 与多节点，当前 DCU 平台不可行；
+  如实记录为「方法数为 2」，不用别的基座凑数。
+- `S1` 的 thinking 口径曾把 LCB 测成 6.0%（−2.5pp）；改用 **plain 模式**后是 8.5% → 14.8%（+6.3pp），
+  与 M0 的 +5.2pp 基本一致。格式诊断见 §6.4、§6.5。
+- `MAGIC` 只跑了 DEV 期；LCB TEST 未跑，因此不能像 M0/S1 那样给 DEV+TEST 合并值。
 
 ## 2. 运行环境（摘要）
 
@@ -262,8 +264,9 @@ HarmBench ASR 与判官看到的文本长度强相关：<400 字符的回答 85�
 5. **判题文本口径**：thinking 模型只判 `<answer>`，全文判定会让 ASR 高约 6pp；
 6. **长度/拒答混杂**：ASR 与回答长度强相关；长度标准化后基线差距缩至 4.2–5.6pp，
    ±7pp 等价在调整后不稳健（见 6.2、D15）；
-7. **只跑了 1 种安全方法**：S1（Self-RedTeam）；S2（AdvGame）、S3（MAGIC）需按论文重训，未安排资源，
-   因此"收益保留"这一结论目前只在 S1 上成立，不能推及所有动态安全改进方法；
+7. **只跑了 2 种安全方法**：S1（Self-RedTeam）与 S3（MAGIC）；S2（AdvGame）的官方训练栈依赖 CUDA/Slurm，
+   当前平台不可行，未运行。S3 目前只有 DEV 期（E0–E3），LCB TEST 待补，
+   因此"收益保留"这一结论在 S1 与 S3 上同向成立，仍不能推及所有动态安全改进方法；
 8. **G3 未按任务书测 LCB DEV**：G3 只用了 KodCode VALID 判定通过（判据允许「或」，
    实测 +22.2/+23.2pp 远超阈值），但任务书 §5 还要求记录 LCB DEV 的试训前后对比，当时遗漏；
    补测结果见 §6.5（D16）。
@@ -282,25 +285,30 @@ HarmBench ASR 与判官看到的文本长度强相关：<400 字符的回答 85�
 | `analysis/length_{summary,bins,decomp,standardized}.csv`、`length_report.md` | 长度/拒答敏感性分析（事后，D15） |
 | `eval/<MODEL>/<E>/xstest_scored.jsonl` | XSTest 逐题判读（只统计 safe 250 题） |
 | `run_log.csv` | 每次运行的起止时间、命令、产出文件与合并 SHA256 |
-| `deviations.md` | 全部协议偏离（D1–D16） |
+| `eval/MAGIC/E<t>/*.jsonl` | MAGIC（S3）DEV 期逐题输出与判定（E0–E3） |
+| `analysis/magic_{summary,gchange}.csv`、`magic_report.md` | MAGIC 汇总指标、收益保留与等价检验 |
+| `deviations.md` | 全部协议偏离（D1–D18） |
 
 ---
 
 ## 9. 原始数据下载
 
-全部逐题原始输出与判定打包如下（**109 个文件、44,885 条记录、11 MB**）：
+全部逐题原始输出与判定打包如下（**123 个逐题文件、47,439 条记录、12 MB**）：
 
 | 文件 | 大小 | 校验 |
 |---|---:|---|
-| [eval_seed1.tar.gz](assets/data/eval_seed1.tar.gz) | 11 MB | `637f3cee…6e23`（[sha256](assets/data/eval_seed1.tar.gz.sha256)） |
+| [eval_seed1.tar.gz](assets/data/eval_seed1.tar.gz)（M0/S1） | 12 MB | `e40f1208…c051`（[sha256](assets/data/eval_seed1.tar.gz.sha256)） |
+| [eval_magic.tar.gz](assets/data/eval_magic.tar.gz)（MAGIC E0–E3） | 3.9 MB | `125f8dd7…7ff5`（[sha256](assets/data/eval_magic.tar.gz.sha256)） |
 
-包内结构：`eval/<MODEL>/<STAGE>/<benchmark>.jsonl`，外加 `MANIFEST.csv`（每个文件的行数与 SHA256）
+`eval_seed1` 包内结构：`eval/<MODEL>/<STAGE>/<benchmark>.jsonl`，外加 `MANIFEST.csv`（每个文件的行数与 SHA256）
 和 `README.md`（字段字典与判定口径）。
 
 ```bash
 curl -LO https://runtaozhuge.github.io/rsi-docs/assets/data/eval_seed1.tar.gz
-shasum -a 256 eval_seed1.tar.gz   # 应等于 637f3ceed03b6014a02f5d2ff6ec2459c48a8ce0912cb0c5dca29fecaba56e23
+shasum -a 256 eval_seed1.tar.gz   # 应等于 e40f1208d34b6704e12d49ed6e9b1365f0e04a66af1c5752c336f7504e3ec051
 tar xzf eval_seed1.tar.gz
 ```
+
+`eval_magic` 包内结构：`MAGIC/E0..E3/`，外加 `MANIFEST.csv` 与 `README.md`；**不含** MAGIC 的 LCB TEST（尚未运行）。
 
 **不含**：模型权重（30 GB）与 13B 判官权重，二者按各自 license 从原仓库获取。

@@ -1,6 +1,6 @@
 # 实验进展与结果
 
-三块数据：**能力前后对比**、**能力提升后的安全变化**、**原始数据**。
+四块数据：**能力前后对比**、**能力提升后的安全变化**、**第二个安全方法 MAGIC**、**原始数据**。
 每块旁边标了对应的原始文件与计算方式；完整逐轮数据在《[详细结果](results-detail.md)》。
 
 ---
@@ -58,7 +58,8 @@ pass@1 = 该状态 passed=true 的题数 / 总题数
 > LCB 解析不到代码。同一条数据在 plain 模式下（G3 试训规模）是 **7.1% → 12.6%（+5.5pp）**。
 > 证据文件：`eval/S1/E0_plain/lcb_dev_scored.jsonl`、`eval/S1/pilot/lcb_dev_plain_scored.jsonl`。
 
-`S2`（AdvGame）/ `S3`（MAGIC）未运行——两者都需按论文重训安全阶段，没有安排算力。
+`S2`（AdvGame）未运行——需要按论文重训安全阶段，当前 DCU 平台不可行（见详细结果）。
+`S3`（MAGIC）已完成 U 阶段的 DEV 期评估（E0–E3）；LCB TEST 尚未跑，见 §3。
 
 **关于 `S1` 的口径**：早期用 thinking 模式测 LCB 时，它的输出格式在 SFT 后退化（含完整代码块 100% → 30%），
 分数塌到 6.0%，看起来像能力下降。改用 **plain 模式重测**后是 **8.5% → 14.8%（+6.3pp）**，与 `M0` 的 +5.2pp 基本一致。
@@ -128,7 +129,41 @@ R(t)   = G(t) / G(0)               G(0) 很小或为负时不解释比值
 
 ---
 
-## 3 原始数据
+## 3 第二个安全方法：MAGIC（S3）
+
+MAGIC 的 U 阶段与 S1 使用**完全同一套** KodCode LoRA-SFT（rank 8 / lr 1e-4 / 3 epoch / seed 42），
+只把起点换成 `XiaoyuWen/MAGIC-Qwen2.5-7B-Instruct`。它的 E0 安全水平（18.0%）与 S1（18.1%）几乎相同，
+因此可以直接比较「同一起点水平下，两种安全方法的收益在能力更新后是否都保留」。
+
+| 状态 | `ASR(MAGIC 分支)` | `KodCode VALID` | `LCB DEV` | `XSTest 过度拒绝` |
+|---|---:|---:|---:|---:|
+| E0 | 18.0% | 26.0% | 6.0% | 6.8% |
+| E1 | 14.3% | 54.4% | 9.3% | 3.6% |
+| E2 | 16.2% | 56.2% | 9.8% | 4.8% |
+| E3 | 14.1% | 55.2% | 12.0% | 6.0% |
+
+`G_MAGIC(t) = ASR(M0/B_t) − ASR(MAGIC/D_t)`：
+
+| t | `ASR(M0/B_t)` | `ASR(MAGIC/D_t)` | `G_MAGIC(t)` | `ΔG` | 90% CI | TOST ±7pp |
+|---:|---:|---:|---:|---:|---|---|
+| 0 | 31.7% | 18.0% | **13.7pp** | — | — | — |
+| 1 | 27.6% | 14.3% | 13.2pp | −0.4 | [−3.9, +3.2] | 通过 |
+| 2 | 28.1% | 16.2% | 11.9pp | −1.7 | [−5.2, +1.5] | 通过 |
+| 3 | 29.2% | 14.1% | **15.1pp** | +1.4 | [−1.8, +4.8] | 通过 |
+
+**结论**：与 S1 同向——安全收益在 ±7pp 内保留，MAGIC 自身 ASR 也从 18.0% 降到 14.1%；
+KodCode 同分布 **+29.2pp**，与 M0/S1 的 +28.4~28.8pp 同量级。
+
+**还没做**：MAGIC 的 LCB TEST（182 题，T0–T3）尚未运行，因此上表的 LCB DEV +6.0pp
+仍低于 183 题的分辨率（约 11.5pp），**不能据此写「独立基准能力提升」**；
+TEST 跑完后才能做 DEV+TEST 合并分析。另外 E1–E3 生成使用了合并后的 adapter，
+与 M0/S1 的未合并路径存在一处推理差异（D17），待一致性检查。
+
+产物：`eval/MAGIC/E0..E3/`、`analysis/magic_report.md`、`analysis/magic_gchange.csv`。
+
+---
+
+## 4 原始数据
 
 | | |
 |---|---|
@@ -154,3 +189,22 @@ eval/<MODEL>/<STAGE>/<benchmark>.jsonl
 ```
 
 不含模型权重（30 GB）与 13B 判官权重，二者按各自 license 从原仓库获取。
+
+### MAGIC（S3）单独打包
+
+`eval_seed1.tar.gz` 只包含 M0/S1。MAGIC 的 E0–E3 逐题文件单独打包：
+
+| | |
+|---|---|
+| 下载 | [`eval_magic.tar.gz`](assets/data/eval_magic.tar.gz)（3.9 MB） |
+| 内容 | **66 个文件**：MAGIC E0–E3 的生成、判定与日志 |
+| 校验 | `125f8dd7c93cfa93e5dc718fcaa2718950c38a984235d8dbbb23607a06c77ff5`（[sha256 文件](assets/data/eval_magic.tar.gz.sha256)） |
+
+```bash
+curl -LO https://runtaozhuge.github.io/rsi-docs/assets/data/eval_magic.tar.gz
+shasum -a 256 eval_magic.tar.gz    # 应等于上面那串
+tar xzf eval_magic.tar.gz          # 解出 MAGIC/E0..E3/
+```
+
+包内路径 `MAGIC/E<t>/`，外加 `MANIFEST.csv`（行数 + SHA256）与 `README.md`（协议与口径）。
+不含 MAGIC 的 LCB TEST（尚未运行）与模型权重。
