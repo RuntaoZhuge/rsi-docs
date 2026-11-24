@@ -32,6 +32,18 @@
       <span class="line" style="left:14.2%;width:10.5%;background:#2a9d8f"></span><span class="dot start" style="left:14.2%"></span><span class="dot end" style="left:24.7%"></span></div>
     <div class="dash-dumb-val" style="color:#2a9d8f">+6.3pp</div>
   </div>
+  <div class="dash-dumb">
+    <div class="dash-dumb-label">KodCode<small>MAGIC<br>26.0 → 55.4</small></div>
+    <div class="dash-track"><span class="tick" style="left:0"></span><span class="tick" style="left:33.3%"></span><span class="tick" style="left:66.7%"></span><span class="tick" style="left:100%"></span>
+      <span class="line" style="left:43.3%;width:49%;background:#4f46e5"></span><span class="dot start" style="left:43.3%"></span><span class="dot end" style="left:92.3%;background:#4f46e5"></span></div>
+    <div class="dash-dumb-val" style="color:#4f46e5">+29.4pp</div>
+  </div>
+  <div class="dash-dumb">
+    <div class="dash-dumb-label">LCB 365<small>MAGIC<br>7.9 → 15.1</small></div>
+    <div class="dash-track"><span class="tick" style="left:0"></span><span class="tick" style="left:33.3%"></span><span class="tick" style="left:66.7%"></span><span class="tick" style="left:100%"></span>
+      <span class="line" style="left:13.2%;width:12%;background:#4f46e5"></span><span class="dot start" style="left:13.2%"></span><span class="dot end" style="left:25.2%;background:#4f46e5"></span></div>
+    <div class="dash-dumb-val" style="color:#4f46e5">+7.1pp</div>
+  </div>
   <div class="dash-scale"><div></div><div class="track"><span>0%</span><span>20%</span><span>40%</span><span>60%</span></div><div></div></div>
   <div class="dash-cap">灰点 = 训练前，彩点 = 训练后。数值同下表；*见文末说明。</div>
 </div>
@@ -137,16 +149,85 @@ MAGIC 的 U 阶段与 S1 使用**完全同一套** KodCode LoRA-SFT（rank 8 / l
 只把起点换成 `XiaoyuWen/MAGIC-Qwen2.5-7B-Instruct`。它的 E0 安全水平（18.0%）与 S1（18.1%）几乎相同，
 因此可以直接比较「同一起点水平下，两种安全方法的收益在能力更新后是否都保留」。
 
-| 状态 | `ASR(MAGIC 分支)` | `KodCode VALID` | `LCB DEV` | `LCB TEST` | `LCB DEV+TEST` | `XSTest 过度拒绝` |
+<div class="dash-chart">
+  <div class="dash-cap"><b>HarmBench ASR</b> · 越低越安全 · 阴影为 <code>G_MAGIC(t)</code></div>
+  <svg viewBox="0 0 760 300" role="img" aria-label="M0 与 MAGIC 的 HarmBench ASR 随 epoch 变化">
+    <g stroke="currentColor" opacity=".13">
+      <line x1="46" y1="250" x2="744" y2="250"/><line x1="46" y1="186" x2="744" y2="186"/>
+      <line x1="46" y1="122" x2="744" y2="122"/><line x1="46" y1="58" x2="744" y2="58"/>
+    </g>
+    <g fill="currentColor" opacity=".5" font-size="11" text-anchor="end" font-family="ui-sans-serif, -apple-system, 'Noto Sans SC', sans-serif">
+      <text x="38" y="254">0%</text><text x="38" y="190">10%</text><text x="38" y="126">20%</text><text x="38" y="62">30%</text>
+    </g>
+    <polygon points="46,47.1 278.7,73.4 511.3,70.2 744,63.1 744,164.9 511.3,151.4 278.7,155.3 46,134.8" fill="#4f46e5" opacity=".07"/>
+    <polyline points="46,47.1 278.7,73.4 511.3,70.2 744,63.1" fill="none" stroke="#e05252" stroke-width="2.6" stroke-linejoin="round"/>
+    <polyline points="46,134.8 278.7,155.3 511.3,151.4 744,164.9" fill="none" stroke="#4f46e5" stroke-width="2.6" stroke-linejoin="round"/>
+    <g fill="var(--md-default-bg-color)" stroke="#e05252" stroke-width="2.4">
+      <circle cx="46" cy="47.1" r="4.4"/><circle cx="278.7" cy="73.4" r="4.4"/><circle cx="511.3" cy="70.2" r="4.4"/><circle cx="744" cy="63.1" r="4.4"/>
+    </g>
+    <g fill="var(--md-default-bg-color)" stroke="#4f46e5" stroke-width="2.4">
+      <circle cx="46" cy="134.8" r="4.4"/><circle cx="278.7" cy="155.3" r="4.4"/><circle cx="511.3" cy="151.4" r="4.4"/><circle cx="744" cy="164.9" r="4.4"/>
+    </g>
+    <g fill="#e05252" font-size="11.5" font-weight="700" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Noto Sans SC', sans-serif">
+      <text x="46" y="36">31.7</text><text x="278.7" y="62">27.6</text><text x="511.3" y="59">28.1</text><text x="744" y="52">29.2</text>
+    </g>
+    <g fill="#4f46e5" font-size="11.5" font-weight="700" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Noto Sans SC', sans-serif">
+      <text x="46" y="151">18.0</text><text x="278.7" y="171">14.8</text><text x="511.3" y="167">15.4</text><text x="744" y="181">13.3</text>
+    </g>
+    <g fill="currentColor" opacity=".55" font-size="11.5" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Noto Sans SC', sans-serif">
+      <text x="46" y="276">E0</text><text x="278.7" y="276">E1</text><text x="511.3" y="276">E2</text><text x="744" y="276">E3</text>
+    </g>
+    <g font-size="11.5" font-family="ui-sans-serif, -apple-system, 'Noto Sans SC', sans-serif">
+      <circle cx="560" cy="14" r="4" fill="#e05252"/><text x="570" y="18" fill="currentColor" opacity=".7">M0</text>
+      <circle cx="620" cy="14" r="4" fill="#4f46e5"/><text x="630" y="18" fill="currentColor" opacity=".7">MAGIC</text>
+    </g>
+  </svg>
+  <div class="dash-cap">G_MAGIC：13.7 → 12.8 → 12.7 → <b>15.8pp</b>；TOST ±7pp 三个 epoch 全通过。</div>
+</div>
+
+| 状态 | `ASR(MAGIC 分支)` | `KodCode VALID` | `LCB DEV` | `LCB TEST` | `LCB DEV+TEST` | `XSTest ↓` |
 |---|---:|---:|---:|---:|---:|---:|
 | E0 | 18.0% | 26.0% | 6.0% | 9.9% | 7.9% | 6.8% |
 | E1 | 14.8% | 54.4% | 11.5% | 15.9% | 13.7% | 4.0% |
 | E2 | 15.4% | 55.4% | 10.9% | 17.0% | 14.0% | 4.8% |
 | E3 | 13.3% | 55.4% | 13.1% | 17.0% | **15.1%** | 6.8% |
 
+> `XSTest` 列为 250 条 safe 提示的过度拒绝率，越低越好。
+
+<div class="dash-chart">
+  <div class="dash-cap"><b>LCB DEV+TEST（365 题）</b> · 独立基准 · 三条分支同一时间窗</div>
+  <svg viewBox="0 0 760 300" role="img" aria-label="M0、S1 与 MAGIC 的 LCB DEV+TEST pass@1 随 epoch 变化">
+    <g stroke="currentColor" opacity=".13">
+      <line x1="46" y1="250" x2="744" y2="250"/><line x1="46" y1="202" x2="744" y2="202"/>
+      <line x1="46" y1="154" x2="744" y2="154"/><line x1="46" y1="106" x2="744" y2="106"/><line x1="46" y1="58" x2="744" y2="58"/>
+    </g>
+    <g fill="currentColor" opacity=".5" font-size="11" text-anchor="end" font-family="ui-sans-serif, -apple-system, 'Noto Sans SC', sans-serif">
+      <text x="38" y="254">0%</text><text x="38" y="206">5%</text><text x="38" y="158">10%</text><text x="38" y="110">15%</text><text x="38" y="62">20%</text>
+    </g>
+    <polyline points="46,160.7 278.7,126.2 511.3,83.9 744,110.8" fill="none" stroke="#e05252" stroke-width="2.4" stroke-linejoin="round" opacity=".85"/>
+    <polyline points="46,168.4 278.7,121.4 511.3,110.8 744,107.9" fill="none" stroke="#2a9d8f" stroke-width="2.4" stroke-linejoin="round" opacity=".85"/>
+    <polyline points="46,174.2 278.7,118.5 511.3,115.6 744,105.0" fill="none" stroke="#4f46e5" stroke-width="3" stroke-linejoin="round"/>
+    <g fill="var(--md-default-bg-color)" stroke="#4f46e5" stroke-width="2.6">
+      <circle cx="46" cy="174.2" r="4.6"/><circle cx="278.7" cy="118.5" r="4.6"/><circle cx="511.3" cy="115.6" r="4.6"/><circle cx="744" cy="105.0" r="5"/>
+    </g>
+    <g fill="#4f46e5" font-size="11.5" font-weight="700" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Noto Sans SC', sans-serif">
+      <text x="46" y="191">7.9</text><text x="278.7" y="108">13.7</text><text x="511.3" y="105">14.0</text><text x="744" y="95">15.1</text>
+    </g>
+    <g fill="currentColor" opacity=".55" font-size="11.5" text-anchor="middle" font-family="ui-sans-serif, -apple-system, 'Noto Sans SC', sans-serif">
+      <text x="46" y="276">E0</text><text x="278.7" y="276">E1</text><text x="511.3" y="276">E2</text><text x="744" y="276">E3</text>
+    </g>
+    <g font-size="11.5" font-family="ui-sans-serif, -apple-system, 'Noto Sans SC', sans-serif">
+      <circle cx="510" cy="14" r="4" fill="#e05252"/><text x="520" y="18" fill="currentColor" opacity=".7">M0</text>
+      <circle cx="570" cy="14" r="4" fill="#2a9d8f"/><text x="580" y="18" fill="currentColor" opacity=".7">S1</text>
+      <circle cx="630" cy="14" r="4" fill="#4f46e5"/><text x="640" y="18" fill="currentColor" opacity=".7">MAGIC</text>
+    </g>
+  </svg>
+  <div class="dash-cap">E0→E3：M0 +5.2pp、S1 +6.3pp、<b>MAGIC +7.1pp</b>（McNemar 33 得 / 7 失，p=4.2e-5）。</div>
+</div>
+
 `G_MAGIC(t) = ASR(M0/B_t) − ASR(MAGIC/D_t)`：
 
-| t | `ASR(M0/B_t)` | `ASR(MAGIC/D_t)` | `G_MAGIC(t)` | `ΔG` | 90% CI | TOST ±7pp |
+| t | `ASR(M0)` | `ASR(MAGIC)` | `G(t)` | `ΔG` | 90% CI | TOST ±7pp |
 |---:|---:|---:|---:|---:|---|---|
 | 0 | 31.7% | 18.0% | **13.7pp** | — | — | — |
 | 1 | 27.6% | 14.8% | 12.8pp | −0.8 | [−4.5, +2.7] | 通过 |
